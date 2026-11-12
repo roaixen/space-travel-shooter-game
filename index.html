@@ -11,6 +11,11 @@
 </head>
 <body>
 <canvas id="c" width="900" height="640"></canvas>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="leaderboard.js"></script>
 <script>
 "use strict";
 const C = document.getElementById('c'), X = C.getContext('2d');
@@ -749,10 +754,15 @@ function draw() {
 
 /* ---------- loop ---------- */
 reset(); state = 'menu';
-let last = performance.now();
+let last = performance.now(), prevState = state;
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
-  update(dt); draw(); requestAnimationFrame(loop);
+  update(dt); draw();
+  if (state !== prevState) {
+    if ((state === 'over' || state === 'win') && window.lbSubmit) window.lbSubmit(score, era);
+    prevState = state;
+  }
+  requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 </script>
